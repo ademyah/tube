@@ -12,7 +12,7 @@
 #include <string.h>
 
 // Constantes et macros
-#define NMAX 100                // Nombre maximum pour la demande
+#define NMAX 40               // Nombre maximum pour la demande
 #define FIFO1 "/tmp/fifo1"      // Nom du FIFO pour les questions
 #define FIFO2 "/tmp/fifo2"      // Nom du FIFO pour les réponses
 

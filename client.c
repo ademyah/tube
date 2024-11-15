@@ -8,23 +8,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void hand(int sig) {
+    printf("fin client");
+    exit(0);
+}
+
 volatile sig_atomic_t reveil = 0;  // Variable pour détecter le signal du serveur
 
 // Handler de réveil du client par le serveur
 void reveil_client(int sig) {
     reveil = 1;
-}
-
-// Handler pour gérer l'interruption du client (SIGINT)
-void gestion_SIGINT(int sig) {
-    printf("\nFin du client suite à la réception du signal SIGINT (%d).\n", sig);
-    exit(0);  // Quitter le client proprement
-}
-
-// Handler pour gérer le signal SIGQUIT
-void gestion_SIGQUIT(int sig) {
-    printf("\nFin du client suite à la réception du signal SIGQUIT (%d).\n", sig);
-    exit(0);  // Quitter le client proprement
+    printf("reponse prete, lecture de fifo2\n");
 }
 
 int main() {
@@ -34,8 +28,6 @@ int main() {
 
     // Configuration des handlers
     signal(SIGUSR1, reveil_client);  // Handler pour réveil du client par le serveur
-    signal(SIGINT, gestion_SIGINT);  // Handler pour gérer SIGINT (Ctrl+C)
-    signal(SIGQUIT, gestion_SIGQUIT);  // Handler pour gérer SIGQUIT (Ctrl+\)
 
     // Ouverture des tubes
     fifo1_fd = open(FIFO1, O_WRONLY);
@@ -51,14 +43,13 @@ int main() {
     printf("Question envoyée pour %d nombres.\n", question.n);
 
     // Attente du réveil par le serveur
-    while (!reveil) pause();
 
     // Lecture de la réponse du serveur
     while (read(fifo2_fd, &reponse, sizeof(Reponse)) > 0) {
         if (reponse.client_pid == question.client_pid) {
             printf("Réponse reçue :\n");
             for (int i = 0; i < reponse.count; i++) {
-                printf("nb[%d] = %d\n", i, reponse.values[i]);
+                printf("nb[%d] = %d , ", i, reponse.values[i]);
             }
 
             // Envoyer un signal au serveur indiquant que la réponse a été lue
@@ -73,6 +64,13 @@ int main() {
         }
     }
 
+    signal(SIGINT, hand);
+    
+    // Ajout d'un délai de 10 secondes pour garder le terminal ouvert
+    printf("Attente de 10 secondes avant de fermer...\n");
+    sleep(10);  // Le programme attend 10 secondes avant de se terminer
+
+    // Fermeture des FIFO
     close(fifo1_fd);
     close(fifo2_fd);
     return 0;

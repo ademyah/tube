@@ -85,7 +85,8 @@ int main() {
             }
         }
     }
-
+    signal(SIGINT,fin_serveur);
+    pause();
     close(fifo1_fd);
     close(fifo2_fd);
     return 0;

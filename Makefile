@@ -1,5 +1,3 @@
-# Makefile pour le projet Client/Serveur
-
 # Compilateur et options
 CC = gcc
 CFLAGS = -Wall
@@ -37,8 +35,6 @@ clean:
 	rm -f /tmp/fifo1 /tmp/fifo2
 	@echo "Nettoyage terminé."
 
-# Règle pour exécuter le serveur et le client
-run:
-	./$(SERVER_EXEC) &
-	./$(CLIENT_EXEC)
-
+# Règle pour exécuter le serveur et plusieurs clients dans des terminaux distincts
+runz:
+	./run_script.sh  # Exécute le script pour lancer les terminaux
